@@ -1,0 +1,29 @@
+{
+  "name": "technical-analysis",
+  "version": "1.0.0",
+  "description": "Let's see if we can make some money from crypto, but it all starts with research",
+  "main": "index.js",
+  "scripts": {
+    "start:server": "nodemon backend/server.js ",
+    "start:frontend": "cd frontend && npm run serve",
+    "start": "npm run start:server && npm run start:frontend ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hooli-Technologies/technical-analysis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hooli-Technologies/technical-analysis/issues"
+  },
+  "homepage": "https://github.com/Hooli-Technologies/technical-analysis#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13"
+  }
+}
