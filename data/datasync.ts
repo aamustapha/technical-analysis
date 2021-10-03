@@ -76,6 +76,7 @@ export default class Datasync {
     const requests: AxiosResponse[] = []
     for (let i = 0; i < this.ranges.length; i++) {
       if (fs.existsSync(      './temp/' + destination + '-part-' + i)) {
+        console.log("skipping")
         continue
       }
       const [start, end] = this.ranges[i]
