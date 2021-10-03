@@ -1,5 +1,6 @@
 import fs from 'fs';
 import axios, {AxiosResponse} from 'axios';
+import axiosRetry from "axios-retry";
 
 enum IntervalDuration {
   '5m' = 300,
@@ -30,6 +31,17 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+axiosRetry(axios, {
+  retries: 3, // number of retries
+  retryDelay: (retryCount) => {
+    console.log(`retry attempt: ${retryCount}`);
+    return retryCount * 30000; // time interval between retries
+  },
+  retryCondition: (error) => {
+    // if retry condition is not specified, by default idempotent requests are retried
+    return error.response?.status === 429;
+  },
+});
 
 export default class Datasync {
   asset: string
