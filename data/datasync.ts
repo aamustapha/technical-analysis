@@ -75,10 +75,16 @@ export default class Datasync {
     let candles: Candle[] = []
     const requests: AxiosResponse[] = []
     for (let i = 0; i < this.ranges.length; i++) {
+      if (fs.existsSync(      './temp/' + destination + '-part-' + i)) {
+        continue
+      }
       const [start, end] = this.ranges[i]
       const url = this.url(start, end)
       console.log(`P => ${i} URL => ${url}`)
-      requests.push(await axios.get(this.url(start, end)))
+      const r = await axios.get(this.url(start, end))
+      fs.writeFileSync('./temp/' + destination + '-part-' + i, JSON.stringify(r.data), 'utf8')
+
+      requests.push(r)
       await sleep(500)
     }
 
