@@ -50,30 +50,23 @@ export default class Datasync {
     const ranges = await this.resolveRange(interval)
 
     const destination = `./data-${asset}-${interval}.json`
-    let candles: Candle[] = []
     const requests: AxiosResponse[] = []
     for (let i = 0; i < ranges.length; i++) {
+      const [start, end] = ranges[i]
+      const url = this.url(asset, interval, start, end)
+      console.log(`P => ${i} URL => ${url}`)
       if (fs.existsSync('./temp/' + destination + '-part-' + i)) {
         console.log("skipping")
         continue
       }
-      const [start, end] = ranges[i]
-      const url = this.url(asset, interval, start, end)
-      console.log(`P => ${i} URL => ${url}`)
-      const r = await axios.get(this.url(asset, interval, start, end))
-      merge(asset, interval)
+      const r = await axios.get(url)
       requests.push(r)
       await sleep(500)
     }
 
-    await Promise.all(requests).then(responses => {
-      candles = responses.map(response => {
-        let r: { candles: Candle[] } = response.data
-        return r.candles
-      }).flat()
-    })
+    await Promise.all(requests)
     merge(asset, interval)
-    console.log('Candles writte to file')
+    console.log('Candles written to file')
     return Promise.resolve()
   }
 
@@ -83,5 +76,6 @@ export default class Datasync {
         await this.fetchData(asset, interval)
       }
     }
+    return Promise.resolve('Done')
   }
 }
