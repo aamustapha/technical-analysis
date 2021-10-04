@@ -1,7 +1,7 @@
 {
   "name": "technical-analysis",
   "version": "1.0.0",
-  "description": "Let's see if we can make some money from crypto, but it all starts with research",
+  "description": "Let's see if we can make some money from crypto :), but it all starts with research",
   "main": "index.js",
   "scripts": {
     "start:server": "nodemon backend/server.js ",
