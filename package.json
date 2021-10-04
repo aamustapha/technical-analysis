@@ -6,7 +6,7 @@
   "scripts": {
     "start:server": "nodemon backend/server.js ",
     "start:frontend": "cd frontend && npm run serve",
-    "start": "npm run start:server && npm run start:frontend ",
+    "start": "concurrently \"npm run start:server\" \"npm run start:frontend\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Hooli-Technologies/technical-analysis#readme",
   "dependencies": {
+    "concurrently": "^6.3.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1"
   },
