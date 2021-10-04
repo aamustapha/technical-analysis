@@ -1,3 +1,8 @@
+#Local Files
+yarn.lock
+frontend/yarn.lock
+ohlc
+temp
 # Logs
 logs
 *.log

@@ -6,7 +6,7 @@
   "scripts": {
     "start:server": "nodemon backend/server.js ",
     "start:frontend": "cd frontend && npm run serve",
-    "start": "npm run start:server && npm run start:frontend ",
+    "start": "concurrently \"npm run start:server\" \"npm run start:frontend\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,6 +24,7 @@
     "express": "^4.17.1"
   },
   "devDependencies": {
+    "concurrently": "^6.3.0",
     "nodemon": "^2.0.13"
   }
 }
