@@ -1,6 +1,7 @@
 import fs from "fs";
+import {Interval} from "./models";
 
-export function merge(asset: String, interval: String) {
+export function merge(asset: String, interval: Interval) {
   const destination = `./data-${asset}-${interval}.json`
   let files = []
   let i = 0
@@ -13,8 +14,3 @@ export function merge(asset: String, interval: String) {
   fs.writeFileSync('./ohlc/' + destination, JSON.stringify(candles), 'utf-8')
   files.map(path => fs.unlinkSync(path))
 }
-
-
-const assets = ['BTC', 'ETH', 'DOT', 'BNB', 'POLY', 'NANO', 'ALGO', 'XLM'].map( asset => {
-  merge(asset, '5m')
-})

@@ -1,31 +1,8 @@
 import fs from 'fs';
 import axios, {AxiosResponse} from 'axios';
 import axiosRetry from "axios-retry";
-
-enum IntervalDuration {
-  '5m' = 300,
-  '15m' = 900,
-  '30m' = 1800,
-  '1h' = 3600,
-  '4h' = 3600 * 4,
-  '1d' = 86400,
-}
-
-type Interval = keyof typeof IntervalDuration
-
-
-interface Candle {
-  open: number,
-  high: number,
-  low: number,
-  close: number,
-  timestamp: number
-}
-
-interface MetaCandle extends Candle {
-  volume: number
-}
-
+import {Interval, Candle, IntervalDuration} from "./models";
+import {merge} from "./merge";
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -44,59 +21,47 @@ axiosRetry(axios, {
 });
 
 export default class Datasync {
-  asset: string
   start: number
-  interval: Interval
-  ranges: number[][]
 
-  constructor(asset: string, interval: Interval, start: number) {
-    this.asset = asset
-    this.interval = interval
+  constructor(start: number) {
     this.start = start
-    this.ranges = this.resolveRange()
-    console.log(this.ranges)
   }
 
-  url(start: number, end: number) {
-    return `https://cryptocandledata.com/api/candles?exchange=binance&tradingPair=${this.asset}USDT&interval=${this.interval}&startDateTime=${start}&endDateTime=${end}`
+  url(asset: string, interval: string, start: number, end: number) {
+    return `https://cryptocandledata.com/api/candles?exchange=binance&tradingPair=${asset}USDT&interval=${interval}&startDateTime=${start}&endDateTime=${end}`
   }
 
-  private resolveRange(): number[][] {
+  private resolveRange(interval: Interval): number[][] {
     const range: number[][] = []
     const now = Math.floor(Date.now() / 1000)
     const duration = now - this.start
-    const dataPoints = Math.ceil(duration / IntervalDuration[this.interval]) // number of candles between start date and now
+    const dataPoints = Math.ceil(duration / IntervalDuration[interval]) // number of candles between start date and now
     const numCandlesInRequest = 500
     for (let i = 0; i < dataPoints / numCandlesInRequest; i++) {
-      const s = this.start + IntervalDuration[this.interval] * numCandlesInRequest * i
-      const f = Math.min(this.start + IntervalDuration[this.interval] * numCandlesInRequest * (i + 1), now)
+      const s = this.start + IntervalDuration[interval] * numCandlesInRequest * i
+      const f = Math.min(this.start + IntervalDuration[interval] * numCandlesInRequest * (i + 1), now)
       range.push([s, f])
     }
     return range
   }
 
 
-  async fetchData(asset?: string, interval?: Interval) {
-    if (asset) {
-      this.asset = asset
-    }
-    if (interval) {
-      this.interval = interval
-    }
-    const destination = `./data-${this.asset}-${this.interval}.json`
+  async fetchData(asset: string, interval: Interval) {
+    const ranges = await this.resolveRange(interval)
+
+    const destination = `./data-${asset}-${interval}.json`
     let candles: Candle[] = []
     const requests: AxiosResponse[] = []
-    for (let i = 0; i < this.ranges.length; i++) {
-      if (fs.existsSync(      './temp/' + destination + '-part-' + i)) {
+    for (let i = 0; i < ranges.length; i++) {
+      if (fs.existsSync('./temp/' + destination + '-part-' + i)) {
         console.log("skipping")
         continue
       }
-      const [start, end] = this.ranges[i]
-      const url = this.url(start, end)
+      const [start, end] = ranges[i]
+      const url = this.url(asset, interval, start, end)
       console.log(`P => ${i} URL => ${url}`)
-      const r = await axios.get(this.url(start, end))
-      fs.writeFileSync('./temp/' + destination + '-part-' + i, JSON.stringify(r.data), 'utf8')
-
+      const r = await axios.get(this.url(asset, interval, start, end))
+      merge(asset, interval)
       requests.push(r)
       await sleep(500)
     }
@@ -107,30 +72,16 @@ export default class Datasync {
         return r.candles
       }).flat()
     })
-
-    fs.writeFileSync(destination, JSON.stringify(candles), 'utf8')
+    merge(asset, interval)
     console.log('Candles writte to file')
     return Promise.resolve()
   }
 
-  async fetchMany(assets: string[], intervals: Interval[]) {
-    const estimatedTime = assets.length * intervals.length * this.ranges.length * 0.7
-    console.log(`Estimated duration => ${(estimatedTime)}seconds`)
+  async fetchAll(assets: string[], intervals: Interval[]) {
     for (const interval of intervals) {
-      this.interval = interval
-      this.ranges = await this.resolveRange()
-
       for (const asset of assets) {
-        await this.fetchData(asset)
+        await this.fetchData(asset, interval)
       }
     }
   }
-
 }
-
-const assets = ['BTC', 'ETH', 'DOT', 'BNB', 'POLY', 'NANO', 'ALGO', 'XLM']
-const intervals: Interval[] = ['5m', '15m', '30m']
-new Datasync('BTC', '5m', 1625140800).fetchMany(assets, intervals)
-
-
-
