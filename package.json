@@ -25,6 +25,7 @@
     "axios-retry": "^3.2.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "talib": "^1.1.4",
     "ts-node": "^10.2.1"
   },
   "devDependencies": {
