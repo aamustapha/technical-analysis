@@ -7,7 +7,7 @@
     "execute": "npx ts-node ",
     "start:server": "nodemon backend/server.js ",
     "start:frontend": "cd frontend && npm run serve",
-    "start": "npm run start:server && npm run start:frontend ",
+    "start": "concurrently \"npm run start:server\" \"npm run start:frontend\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^16.7.6",
+    "concurrently": "^6.3.0",
     "nodemon": "^2.0.13",
     "typescript": "^4.4.2"
   }
