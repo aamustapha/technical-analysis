@@ -36,3 +36,5 @@ export type IndicatorLevel = {
   timestamp: number;
   level: number;
 };
+
+export type MovingAverageType = 'sma' | 'ema'
