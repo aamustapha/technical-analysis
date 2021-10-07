@@ -41,30 +41,14 @@ export default {
           ].concat(ohlc.volume);
         }),
         onchart: [
-          ...["sma", "ema"].map((indicator) => {
+          ...Object.keys(indicators).map((indicator) => {
             return {
               name: indicator.toUpperCase() + ", 20",
-              type: indicator.toUpperCase(),
-              data: indicators[indicator]
-                .map((point) => [point.timestamp, point.level])
-                .splice(-2000),
+              type: this.type(indicator),
+              data: indicators[indicator].map((point) =>
+                this.dataPoint(point, indicator)
+              ),
               setting: settings[indicator] || {},
-            };
-          }),
-          ...["golden"].map((indicator) => {
-            return {
-              name: "Crossover",
-              type: "Trades",
-              data: indicators[indicator]
-                .map((point) => [
-                  point.timestamp,
-                  0,
-                  ohlcv.find((candle) => {
-                    return candle.timestamp == point.timestamp;
-                  })?.low || point.level,
-                ])
-                .splice(-2000),
-              setting: settings[indicator] || settings.rsa,
             };
           }),
           {
@@ -88,6 +72,23 @@ export default {
     };
   },
   methods: {
+    dataPoint(point, indicator) {
+      switch (indicator) {
+        case "golden":
+          return [point.timestamp, 0, point.level];
+
+        default:
+          return [point.timestamp, point.level];
+      }
+    },
+    type(indicator) {
+      switch (indicator) {
+        case "golden":
+          return "Trades";
+        default:
+          return indicator.toUpperCase;
+      }
+    },
     onResize() {
       this.width = window.innerWidth;
       this.height = window.innerHeight;
