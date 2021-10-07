@@ -1,18 +1,19 @@
 <template>
   <div id="app">
+  
     <market-data />
   </div>
 </template>
 
 <script>
-import MarketData from './components/MarketData'
+import MarketData from "./components/MarketData";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     MarketData,
-  }
-}
+  },
+};
 </script>
 
 <style>
@@ -20,7 +21,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 </style>
