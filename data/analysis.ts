@@ -216,7 +216,7 @@ export default class Analysis {
     movingAverages: [MovingAverageType, MovingAverageType],
     period: [number, number],
     applyTo: ApplyTo = "close"
-  ) {
+  ): Promise<IndicatorLevel[]> {
     const [ma1, ma2] = movingAverages;
     const [period1, period2] = period;
     return Promise.all([
@@ -274,7 +274,7 @@ export default class Analysis {
     movingAverages: [MovingAverageType, MovingAverageType],
     period: [number, number],
     applyTo: ApplyTo = "close"
-  ) {
+  ): Promise<IndicatorLevel[]> {
     const [ma1, ma2] = movingAverages;
     const [period1, period2] = period;
     return Promise.all([
@@ -321,14 +321,23 @@ export default class Analysis {
   }
 }
 
+const analysis = new Analysis("./ohlc/ALGO15.json", 5000);
 // new Analysis("./ohlc/ALGO15.json").adx(9).then(console.log);
 // new Analysis("./ohlc/ALGO15.json").rsi(9).then(console.log);
 // new Analysis("./ohlc/ALGO15.json").rsiBuyLevels(25).then(console.log);
-// new Analysis("./ohlc/ALGO15.json").rsiSellLevels().then(console.log);
-// new Analysis("./ohlc/ALGO15.json").smaCrossOverBuy().then(console.log);
-// new Analysis("./ohlc/ALGO15.json")
-//   .maCrossBuy(["sma", "ema"], [20, 100])
-//   .then(console.log);
+
+Promise.all([
+  analysis.rsiBuyLevels(),
+  analysis.smaCrossOverBuy(),
+  analysis.maCrossBuy(["sma", "ema"], [20, 100]),
+]).then((response) => {
+  const [rsi, sma, golden] = response;
+  fs.writeFileSync(
+    "./indicators/first.json",
+    JSON.stringify({ rsi, sma, golden }, null, 2),
+    "utf-8"
+  );
+});
 
 // new Analysis("./ohlc/ALGO15.json").explain("SMA").then((details) => {
 //   console.dir(details, { depth: null });
