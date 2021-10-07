@@ -47,6 +47,19 @@ export default class Analysis {
     });
   }
 
+  emaLine(
+    period: number = 30,
+    applyTo: ApplyTo = "close"
+  ): Promise<IndicatorLevel[]> {
+    return this.ema(period, applyTo).then((sma) => {
+      const smaLine = sma.result.outReal;
+      smaLine.splice(0, 0, ...Array(sma.begIndex));
+      return this.marketData.map((candle, index) => {
+        return { timestamp: candle.timestamp, level: smaLine[index] };
+      });
+    });
+  }
+
   explain(func: string) {
     return new Promise((resolve, reject) => {
       const function_desc = talib.explain(func);
@@ -153,6 +166,19 @@ export default class Analysis {
           resolve(result);
         }
       );
+    });
+  }
+
+  smaLine(
+    period: number = 30,
+    applyTo: ApplyTo = "close"
+  ): Promise<IndicatorLevel[]> {
+    return this.sma(period, applyTo).then((sma) => {
+      const smaLine = sma.result.outReal;
+      smaLine.splice(0, 0, ...Array(sma.begIndex));
+      return this.marketData.map((candle, index) => {
+        return { timestamp: candle.timestamp, level: smaLine[index] };
+      });
     });
   }
 
@@ -327,14 +353,15 @@ const analysis = new Analysis("./ohlc/ALGO15.json", 5000);
 // new Analysis("./ohlc/ALGO15.json").rsiBuyLevels(25).then(console.log);
 
 Promise.all([
-  analysis.rsiBuyLevels(),
-  analysis.smaCrossOverBuy(),
+  // analysis.rsiBuyLevels(),
+  analysis.smaLine(20),
+  analysis.emaLine(100),
   analysis.maCrossBuy(["sma", "ema"], [20, 100]),
 ]).then((response) => {
-  const [rsi, sma, golden] = response;
+  const [sma, ema, golden] = response;
   fs.writeFileSync(
-    "./indicators/first.json",
-    JSON.stringify({ rsi, sma, golden }, null, 2),
+    "./indicators/d.json",
+    JSON.stringify({ sma, ema, golden }, null, 2),
     "utf-8"
   );
 });
