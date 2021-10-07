@@ -13,10 +13,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { DataCube } from "trading-vue-js";
-import ohlcv from "@/ALGO15m.json";
-import indicators from "@/indicator.json";
+import ohlcv from "../ALGO15m.json";
+import indicators from "../indicator.json";
 
 const settings = {
   rsa: {
