@@ -1,4 +1,3 @@
-import { Candle } from "./models";
 export enum IntervalDuration {
   "5m" = 300,
   "15m" = 900,
