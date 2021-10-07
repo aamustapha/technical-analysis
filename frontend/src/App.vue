@@ -5,8 +5,8 @@
   </div>
 </template>
 
-<script>
-import MarketData from "./components/MarketData";
+<script lang="ts">
+import MarketData from "./components/MarketData.vue";
 
 export default {
   name: "App",
