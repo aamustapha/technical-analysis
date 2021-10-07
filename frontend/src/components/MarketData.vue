@@ -51,15 +51,6 @@ export default {
               setting: settings[indicator] || {},
             };
           }),
-          {
-            name: "Data sections",
-            type: "Splitters",
-            data: [[1633277700000, "Welcome aboard 😎", 1, "#22b57f"]],
-            settings: {
-              legend: false,
-              lineColor: "#22b57f",
-            },
-          },
         ],
       }),
       width: window.innerWidth - 23,
@@ -77,6 +68,9 @@ export default {
         case "golden":
           return [point.timestamp, 0, point.level];
 
+        // case "golden":
+        //   return [point.timestamp, "Trade entry point", 0, "#22b57f",];
+
         default:
           return [point.timestamp, point.level];
       }
@@ -86,7 +80,7 @@ export default {
         case "golden":
           return "Trades";
         default:
-          return indicator.toUpperCase;
+          return indicator.toUpperCase();
       }
     },
     onResize() {
